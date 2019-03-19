@@ -9,6 +9,7 @@
         Title="改元ユニコーン" SizeToContent="WidthAndHeight" ResizeMode="NoResize" ContentRendered="Window_ContentRendered">
     <StackPanel Margin="5">
         <TextBlock Margin="3" Text="改元の日付を指定"/>
-        <DatePicker x:Name="detePicker1" Margin="3" SelectedDateFormat="Long" SelectedDate="2019/5/1" Width="150"/>        
+        <DatePicker x:Name="detePicker1" Margin="3" SelectedDateFormat="Long" SelectedDate="2019/5/1" Width="150"/>
+        <Button Margin="3" Content="終了" Click="Button_Click"/>
     </StackPanel>
 </Window>
