@@ -24,7 +24,9 @@ namespace 改元ユニコーン
         private CancellationTokenSource tokenSource = null;
         private CancellationToken token;
 
-        public MainWindow()
+		private static int winnerTime = 41;
+
+		public MainWindow()
         {
             InitializeComponent();
         }
@@ -69,8 +71,10 @@ namespace 改元ユニコーン
         {
             while (!token.IsCancellationRequested)
             {
-
-            }
+				DateTime kaigenTime = detePicker1.SelectedDate.Value;
+				TimeSpan timeSpan = new TimeSpan(0, 0, winnerTime);
+				DateTime startUnicornTime = kaigenTime - timeSpan;
+			}
         }
 
         /// <summary>
@@ -83,11 +87,6 @@ namespace 改元ユニコーン
             {
                 tokenSource.Cancel();
             }
-        }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            CancelMainLoop();
         }
 
         /// <summary>
