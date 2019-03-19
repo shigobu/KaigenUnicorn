@@ -24,5 +24,24 @@ namespace 改元ユニコーン
         {
             InitializeComponent();
         }
+
+        /// <summary>
+        /// 表示されたとき
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Window_ContentRendered(object sender, EventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// メインループ
+        /// 現在時刻を監視して、指定時刻になったら、ユニコーンを再生する。
+        /// </summary>
+        private void MainLoop()
+        {
+
+        }
     }
 }
