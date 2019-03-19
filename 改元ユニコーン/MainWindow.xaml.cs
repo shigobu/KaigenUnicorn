@@ -55,6 +55,8 @@ namespace 改元ユニコーン
                     tokenSource.Dispose();
                     //別メソッドでtokenSourceがnullかどうか参照しているので、nullの代入をする。
                     tokenSource = null;
+
+                    this.Close();
                 }
             }
         }
@@ -86,6 +88,20 @@ namespace 改元ユニコーン
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             CancelMainLoop();
+        }
+
+        /// <summary>
+        /// ウィンドウが閉じようとしているとき
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            CancelMainLoop();
+            if (tokenSource != null)
+            {
+                e.Cancel = true;
+            }
         }
     }
 }
