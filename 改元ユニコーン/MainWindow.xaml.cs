@@ -29,6 +29,8 @@ namespace 改元ユニコーン
         //ユニコーンが完全勝利するまでの秒数
 		private static int winnerTime = 41;
 
+        private Task fadeOutTask = null;
+
         //フラグ
         /// <summary>
         /// Unicorn再生済フラグ
@@ -159,7 +161,7 @@ namespace 改元ユニコーン
                 return;
             }
             //フェードアウトタスク実行
-            Task task = Task.Run(new Action(FadeOutThread));
+            fadeOutTask = Task.Run(new Action(FadeOutThread));
 
             IsFadeoutStart = true;
         }
@@ -220,12 +222,22 @@ namespace 改元ユニコーン
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            //メインループキャンセルリクエスト
             CancelMainLoop();
             if (tokenSource != null)
             {
                 e.Cancel = true;
+                return;
+            }
+
+            //フェードアウトタスク終了待機
+            if (fadeOutTask != null)
+            {
+                await fadeOutTask;
+                fadeOutTask.Dispose();
+                fadeOutTask = null;
             }
         }
 
