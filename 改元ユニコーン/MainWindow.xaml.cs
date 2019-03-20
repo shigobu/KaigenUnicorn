@@ -138,8 +138,10 @@ namespace 改元ユニコーン
             {
                 return;
             }
-
-            soundPlayer.Play();
+            if (soundPlayer != null)
+            {
+                soundPlayer.Play();
+            }
 
             IsStartUnicorn = true;
         }
