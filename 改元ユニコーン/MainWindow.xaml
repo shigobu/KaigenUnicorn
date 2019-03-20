@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:改元ユニコーン"
         mc:Ignorable="d"
         xmlns:System="clr-namespace:System;assembly=mscorlib"
-        Title="改元ユニコーン" SizeToContent="WidthAndHeight" ResizeMode="NoResize" ContentRendered="Window_ContentRendered" Closing="Window_Closing">
+        Title="改元ユニコーン" SizeToContent="WidthAndHeight" ResizeMode="NoResize" ContentRendered="Window_ContentRendered" Closing="Window_Closing" WindowStartupLocation="CenterScreen">
     <StackPanel Margin="5">
         <TextBlock Margin="3" Text="改元の日付を指定"/>
         <DatePicker x:Name="datePicker1" Margin="3" SelectedDateFormat="Long" SelectedDate="2019/5/1" Width="150"/>
