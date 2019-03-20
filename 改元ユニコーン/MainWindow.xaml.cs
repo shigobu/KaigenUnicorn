@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CoreAudioApi;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -157,6 +158,8 @@ namespace 改元ユニコーン
             {
                 return;
             }
+            //フェードアウトタスク実行
+            Task task = Task.Run(new Action(FadeOutThread));
 
             IsFadeoutStart = true;
         }
@@ -170,6 +173,45 @@ namespace 改元ユニコーン
             if (tokenSource != null)
             {
                 tokenSource.Cancel();
+            }
+        }
+
+        /// <summary>
+        /// フェードアウトを実行するタスク
+        /// </summary>
+        private void FadeOutThread()
+        {
+            //自分自身のプロセスを取得する
+            System.Diagnostics.Process p = System.Diagnostics.Process.GetCurrentProcess();
+            int pid = p.Id;
+
+            MMDevice device = null;
+            try
+            {
+                using (MMDeviceEnumerator DevEnum = new MMDeviceEnumerator())
+                {
+                    device = DevEnum.GetDefaultAudioEndpoint(EDataFlow.eRender, ERole.eMultimedia);
+                }
+                float MasterVolumeLevel = device.AudioEndpointVolume.MasterVolumeLevelScalar;
+                AudioSessionManager sessionManager = device.AudioSessionManager;
+                for (float i = 100; i >= 0; i -= 1f)
+                {
+                    foreach (var item in sessionManager.Sessions)
+                    {
+                        if (item.ProcessID != (uint)pid)
+                        {
+                            item.SimpleAudioVolume.MasterVolume = (i / 100.0f);
+                        }
+                    }
+                    Thread.Sleep(50);
+                }
+            }
+            finally
+            {
+                if (device != null)
+                {
+                    device.Dispose();
+                }
             }
         }
 
