@@ -21,12 +21,31 @@ namespace 改元ユニコーン
     /// </summary>
     public partial class MainWindow : Window
     {
+        //キャンセルトークン
         private CancellationTokenSource tokenSource = null;
         private CancellationToken token;
 
+        //ユニコーンが完全勝利するまでの秒数
 		private static int winnerTime = 41;
 
-		public MainWindow()
+        //フラグ
+        /// <summary>
+        /// Unicorn再生済フラグ
+        /// </summary>
+        private bool IsStartUnicorn { get; set; } = false;
+
+        /// <summary>
+        /// Unicorn読み込み済フラグ
+        /// </summary>
+        private bool IsLoadUnicorn { get; set; } = false;
+
+        /// <summary>
+        /// フェードアウト開始済フラグ
+        /// </summary>
+        private bool IsFadeoutStart { get; set; } = false;
+
+
+        public MainWindow()
         {
             InitializeComponent();
         }
@@ -71,10 +90,75 @@ namespace 改元ユニコーン
         {
             while (!token.IsCancellationRequested)
             {
-				DateTime kaigenTime = detePicker1.SelectedDate.Value;
-				TimeSpan timeSpan = new TimeSpan(0, 0, winnerTime);
-				DateTime startUnicornTime = kaigenTime - timeSpan;
-			}
+                //改元日取得
+				DateTime kaigenTime = GetKaigenTime();
+                //Unicorn再生開始時間
+				DateTime startUnicornTime = kaigenTime - new TimeSpan(0, 0, winnerTime);
+                //Unicornロード開始時間
+                DateTime loadUnicornTime = startUnicornTime - new TimeSpan(0, 0, 10);
+                //フェードアウト開始時間
+                DateTime fadeoutStartTime = startUnicornTime - new TimeSpan(0, 0, 5);
+                //現在時刻取得
+                DateTime NowTime = DateTime.Now;
+
+                if (NowTime >= startUnicornTime)
+                {
+                    //ユニコーン再生開始
+                    StartUnicorn();
+                }
+                if (NowTime >= loadUnicornTime)
+                {
+                    //ユニコーン読み込み開始
+                    LoadUnicorn();
+                }
+                if (NowTime >= fadeoutStartTime)
+                {
+                    //フェードアウト開始
+                    FadeOutStart();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Unicornの再生を開始します。
+        /// </summary>
+        private void StartUnicorn()
+        {
+            //一回のみ実行させる
+            if (IsStartUnicorn)
+            {
+                return;
+            }
+
+            IsStartUnicorn = true;
+        }
+
+        /// <summary>
+        /// Unicornの読み込みを開始します。
+        /// </summary>
+        private void LoadUnicorn()
+        {
+            //一回のみ実行させる
+            if (IsLoadUnicorn)
+            {
+                return;
+            }
+
+            IsLoadUnicorn = true;
+        }
+
+        /// <summary>
+        /// フェードアウトを開始します。
+        /// </summary>
+        private void FadeOutStart()
+        {
+            //一回のみ実行させる
+            if (IsFadeoutStart)
+            {
+                return;
+            }
+
+            IsFadeoutStart = true;
         }
 
         /// <summary>
@@ -100,6 +184,22 @@ namespace 改元ユニコーン
             if (tokenSource != null)
             {
                 e.Cancel = true;
+            }
+        }
+
+        /// <summary>
+        /// 入力されている改元日時を取得します。
+        /// </summary>
+        /// <returns></returns>
+        private DateTime GetKaigenTime()
+        {
+            if (datePicker1.Dispatcher.CheckAccess())
+            {
+                return datePicker1.SelectedDate.Value;
+            }
+            else
+            {
+                return datePicker1.Dispatcher.Invoke<DateTime>(new Func<DateTime>(GetKaigenTime));
             }
         }
     }
