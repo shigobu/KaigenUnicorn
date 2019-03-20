@@ -35,7 +35,7 @@ namespace 改元ユニコーン
 
         //Unicorn再生関連
         private static string unicornWavePath = "";
-        SoundPlayer soundplayer = null;
+        SoundPlayer soundPlayer = null;
 
         //フラグ
         /// <summary>
@@ -139,7 +139,7 @@ namespace 改元ユニコーン
                 return;
             }
 
-            soundplayer.Play();
+            soundPlayer.Play();
 
             IsStartUnicorn = true;
         }
@@ -157,8 +157,8 @@ namespace 改元ユニコーン
 
             if (System.IO.File.Exists(unicornWavePath))
             {
-                soundplayer = new SoundPlayer(unicornWavePath);
-                soundplayer.Load();
+                soundPlayer = new SoundPlayer(unicornWavePath);
+                soundPlayer.Load();
             }
 
             IsLoadUnicorn = true;
@@ -251,6 +251,14 @@ namespace 改元ユニコーン
                 await fadeOutTask;
                 fadeOutTask.Dispose();
                 fadeOutTask = null;
+            }
+
+            //サウンドプレイヤーの破棄
+            if (soundPlayer != null)
+            {
+                soundPlayer.Stop();
+                soundPlayer.Dispose();
+                soundPlayer = null;
             }
         }
 
