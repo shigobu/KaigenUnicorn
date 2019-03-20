@@ -98,7 +98,7 @@ namespace 改元ユニコーン
                 //Unicornロード開始時間
                 DateTime loadUnicornTime = startUnicornTime - new TimeSpan(0, 0, 10);
                 //フェードアウト開始時間
-                DateTime fadeoutStartTime = startUnicornTime - new TimeSpan(0, 0, 5);
+                DateTime fadeoutStartTime = startUnicornTime - new TimeSpan(0, 0, 3);
                 //現在時刻取得
                 DateTime NowTime = DateTime.Now;
 
