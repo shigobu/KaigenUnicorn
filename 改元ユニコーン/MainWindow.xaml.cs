@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Media;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -29,7 +30,12 @@ namespace 改元ユニコーン
         //ユニコーンが完全勝利するまでの秒数
 		private static int winnerTime = 41;
 
+        //フェードアウトタスク
         private Task fadeOutTask = null;
+
+        //Unicorn再生関連
+        private static string unicornWavePath = "";
+        SoundPlayer soundplayer = null;
 
         //フラグ
         /// <summary>
@@ -133,6 +139,8 @@ namespace 改元ユニコーン
                 return;
             }
 
+            soundplayer.Play();
+
             IsStartUnicorn = true;
         }
 
@@ -145,6 +153,12 @@ namespace 改元ユニコーン
             if (IsLoadUnicorn)
             {
                 return;
+            }
+
+            if (System.IO.File.Exists(unicornWavePath))
+            {
+                soundplayer = new SoundPlayer(unicornWavePath);
+                soundplayer.Load();
             }
 
             IsLoadUnicorn = true;
@@ -194,7 +208,6 @@ namespace 改元ユニコーン
                 {
                     device = DevEnum.GetDefaultAudioEndpoint(EDataFlow.eRender, ERole.eMultimedia);
                 }
-                float MasterVolumeLevel = device.AudioEndpointVolume.MasterVolumeLevelScalar;
                 AudioSessionManager sessionManager = device.AudioSessionManager;
                 for (float i = 100; i >= 0; i -= 1f)
                 {
