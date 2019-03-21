@@ -45,7 +45,6 @@ namespace 改元ユニコーン
 
         //Unicorn再生関連
         private static string unicornWavePath = @"D:\茂信\Music\青と白の逆方向.wav";
-        SoundPlayer soundPlayer = null;
 
         //フラグ
         /// <summary>
