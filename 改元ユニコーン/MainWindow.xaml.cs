@@ -12,8 +12,29 @@ namespace 改元ユニコーン
 	/// </summary>
 	public partial class MainWindow : Window
     {
-        //キャンセルトークン
-        private CancellationTokenSource tokenSource = null;
+		//サウンドを再生するWin32 APIの宣言
+		[Flags]
+		public enum PlaySoundFlags : int
+		{
+			SND_SYNC = 0x0000,
+			SND_ASYNC = 0x0001,
+			SND_NODEFAULT = 0x0002,
+			SND_MEMORY = 0x0004,
+			SND_LOOP = 0x0008,
+			SND_NOSTOP = 0x0010,
+			SND_NOWAIT = 0x00002000,
+			SND_ALIAS = 0x00010000,
+			SND_ALIAS_ID = 0x00110000,
+			SND_FILENAME = 0x00020000,
+			SND_RESOURCE = 0x00040004,
+			SND_PURGE = 0x0040,
+			SND_APPLICATION = 0x0080
+		}
+		[System.Runtime.InteropServices.DllImport("winmm.dll", CharSet = System.Runtime.InteropServices.CharSet.Auto)]
+		private static extern bool PlaySound(string pszSound, IntPtr hmod, PlaySoundFlags fdwSound);
+
+		//キャンセルトークン
+		private CancellationTokenSource tokenSource = null;
         private CancellationToken token;
 
         //ユニコーンが完全勝利するまでの秒数
@@ -93,18 +114,11 @@ namespace 改元ユニコーン
 				DateTime kaigenTime = GetKaigenTime();
                 //Unicorn再生開始時間
 				DateTime startUnicornTime = kaigenTime - new TimeSpan(0, 0, winnerTime);
-                //Unicornロード開始時間
-                DateTime loadUnicornTime = startUnicornTime - new TimeSpan(0, 0, 10);
                 //フェードアウト開始時間
                 DateTime fadeoutStartTime = startUnicornTime - new TimeSpan(0, 0, 8);
                 //現在時刻取得
                 DateTime NowTime = DateTime.Now;
 
-                if (NowTime >= loadUnicornTime)
-                {
-                    //ユニコーン読み込み開始
-                    LoadUnicorn();
-                }
                 if (NowTime >= startUnicornTime)
                 {
                     //ユニコーン再生開始
@@ -129,32 +143,9 @@ namespace 改元ユニコーン
             {
                 return;
             }
-            if (soundPlayer != null)
-            {
-                soundPlayer.Play();
-            }
+			PlaySound(unicornWavePath, IntPtr.Zero, PlaySoundFlags.SND_FILENAME | PlaySoundFlags.SND_ASYNC);
 
-            IsStartUnicorn = true;
-        }
-
-        /// <summary>
-        /// Unicornの読み込みを開始します。
-        /// </summary>
-        private void LoadUnicorn()
-        {
-            //一回のみ実行させる
-            if (IsLoadUnicorn)
-            {
-                return;
-            }
-
-            if (System.IO.File.Exists(unicornWavePath))
-            {
-                soundPlayer = new SoundPlayer(unicornWavePath);
-                soundPlayer.Load();
-            }
-
-            IsLoadUnicorn = true;
+			IsStartUnicorn = true;
         }
 
         /// <summary>
@@ -246,13 +237,8 @@ namespace 改元ユニコーン
                 fadeOutTask = null;
             }
 
-            //サウンドプレイヤーの破棄
-            if (soundPlayer != null)
-            {
-                soundPlayer.Stop();
-				soundPlayer.Dispose();
-				soundPlayer = null;
-            }
+			//再生しているWAVを停止する
+			PlaySound(null, IntPtr.Zero, PlaySoundFlags.SND_PURGE);
         }
 
         /// <summary>
