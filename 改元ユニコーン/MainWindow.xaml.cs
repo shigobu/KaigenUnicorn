@@ -1,27 +1,16 @@
 ﻿using CoreAudioApi;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Media;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace 改元ユニコーン
 {
-    /// <summary>
-    /// MainWindow.xaml の相互作用ロジック
-    /// </summary>
-    public partial class MainWindow : Window
+	/// <summary>
+	/// MainWindow.xaml の相互作用ロジック
+	/// </summary>
+	public partial class MainWindow : Window
     {
         //キャンセルトークン
         private CancellationTokenSource tokenSource = null;
@@ -34,7 +23,7 @@ namespace 改元ユニコーン
         private Task fadeOutTask = null;
 
         //Unicorn再生関連
-        private static string unicornWavePath = "";
+        private static string unicornWavePath = @"D:\茂信\Music\青と白の逆方向.wav";
         SoundPlayer soundPlayer = null;
 
         //フラグ
@@ -72,6 +61,7 @@ namespace 改元ユニコーン
             {
                 tokenSource = new CancellationTokenSource();
                 token = tokenSource.Token;
+				datePicker1.SelectedDate = new DateTime(2019, 3, 21, 15, 30, 0);
                 await Task.Run(new Action(MainLoop), token);
             }
             catch (Exception ex)
@@ -106,25 +96,26 @@ namespace 改元ユニコーン
                 //Unicornロード開始時間
                 DateTime loadUnicornTime = startUnicornTime - new TimeSpan(0, 0, 10);
                 //フェードアウト開始時間
-                DateTime fadeoutStartTime = startUnicornTime - new TimeSpan(0, 0, 3);
+                DateTime fadeoutStartTime = startUnicornTime - new TimeSpan(0, 0, 8);
                 //現在時刻取得
                 DateTime NowTime = DateTime.Now;
 
-                if (NowTime >= startUnicornTime)
-                {
-                    //ユニコーン再生開始
-                    StartUnicorn();
-                }
                 if (NowTime >= loadUnicornTime)
                 {
                     //ユニコーン読み込み開始
                     LoadUnicorn();
+                }
+                if (NowTime >= startUnicornTime)
+                {
+                    //ユニコーン再生開始
+                    StartUnicorn();
                 }
                 if (NowTime >= fadeoutStartTime)
                 {
                     //フェードアウト開始
                     FadeOutStart();
                 }
+				Thread.Sleep(10);
             }
         }
 
@@ -220,7 +211,7 @@ namespace 改元ユニコーン
                             item.SimpleAudioVolume.MasterVolume = (i / 100.0f);
                         }
                     }
-                    Thread.Sleep(50);
+                    Thread.Sleep(100);
                 }
             }
             finally
@@ -259,8 +250,8 @@ namespace 改元ユニコーン
             if (soundPlayer != null)
             {
                 soundPlayer.Stop();
-                soundPlayer.Dispose();
-                soundPlayer = null;
+				soundPlayer.Dispose();
+				soundPlayer = null;
             }
         }
 
