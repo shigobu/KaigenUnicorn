@@ -1,4 +1,6 @@
 ﻿using NAudio.CoreAudioApi;
+using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
 using System;
 using System.Media;
 using System.Threading;
@@ -12,29 +14,12 @@ namespace 改元ユニコーン
 	/// </summary>
 	public partial class MainWindow : Window
     {
-		//サウンドを再生するWin32 APIの宣言
-		[Flags]
-		public enum PlaySoundFlags : int
-		{
-			SND_SYNC = 0x0000,
-			SND_ASYNC = 0x0001,
-			SND_NODEFAULT = 0x0002,
-			SND_MEMORY = 0x0004,
-			SND_LOOP = 0x0008,
-			SND_NOSTOP = 0x0010,
-			SND_NOWAIT = 0x00002000,
-			SND_ALIAS = 0x00010000,
-			SND_ALIAS_ID = 0x00110000,
-			SND_FILENAME = 0x00020000,
-			SND_RESOURCE = 0x00040004,
-			SND_PURGE = 0x0040,
-			SND_APPLICATION = 0x0080
-		}
-		[System.Runtime.InteropServices.DllImport("winmm.dll", CharSet = System.Runtime.InteropServices.CharSet.Auto)]
-		private static extern bool PlaySound(string pszSound, IntPtr hmod, PlaySoundFlags fdwSound);
+        //Audio再生オブジェクト
+        private WaveOutEvent outputDevice;
+        private AudioFileReader audioFile;
 
-		//キャンセルトークン
-		private CancellationTokenSource tokenSource = null;
+        //キャンセルトークン
+        private CancellationTokenSource tokenSource = null;
         private CancellationToken token;
 
         //ユニコーンが完全勝利するまでの秒数
@@ -113,11 +98,18 @@ namespace 改元ユニコーン
 				DateTime kaigenTime = GetKaigenTime();
                 //Unicorn再生開始時間
 				DateTime startUnicornTime = kaigenTime - new TimeSpan(0, 0, winnerTime);
+                //Unicorn読み込み開始時間
+                DateTime loadUnicornTime = startUnicornTime - new TimeSpan(0, 1, 0);
                 //フェードアウト開始時間
                 DateTime fadeoutStartTime = startUnicornTime - new TimeSpan(0, 0, 8);
                 //現在時刻取得
                 DateTime NowTime = DateTime.Now;
 
+                if (NowTime >= loadUnicornTime)
+                {
+                    //読み込み開始
+                    LoadUnicorn();
+                }
                 if (NowTime >= startUnicornTime)
                 {
                     //ユニコーン再生開始
@@ -133,6 +125,44 @@ namespace 改元ユニコーン
         }
 
         /// <summary>
+        /// オーディオファイルを読み込みます。
+        /// </summary>
+        private void LoadUnicorn()
+        {
+            //一回のみ実行させる
+            if (IsLoadUnicorn)
+            {
+                return;
+            }
+
+            if (outputDevice == null)
+            {
+                outputDevice = new WaveOutEvent();
+                outputDevice.PlaybackStopped += OnPlaybackStopped;
+            }
+            if (audioFile == null)
+            {
+                audioFile = new AudioFileReader(unicornWavePath);
+                outputDevice.Init(audioFile);
+            }
+
+            IsLoadUnicorn = true;
+        }
+
+        /// <summary>
+        /// 再生終了時の発動するイベント
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnPlaybackStopped(object sender, StoppedEventArgs e)
+        {
+            outputDevice.Dispose();
+            outputDevice = null;
+            audioFile.Dispose();
+            audioFile = null;
+        }
+
+        /// <summary>
         /// Unicornの再生を開始します。
         /// </summary>
         private void StartUnicorn()
@@ -142,9 +172,11 @@ namespace 改元ユニコーン
             {
                 return;
             }
-			PlaySound(unicornWavePath, IntPtr.Zero, PlaySoundFlags.SND_FILENAME | PlaySoundFlags.SND_ASYNC);
 
-			IsStartUnicorn = true;
+            //再生
+            outputDevice?.Play();
+
+            IsStartUnicorn = true;
         }
 
         /// <summary>
@@ -237,8 +269,37 @@ namespace 改元ユニコーン
                 fadeOutTask = null;
             }
 
-			//再生しているWAVを停止する
-			PlaySound(null, IntPtr.Zero, PlaySoundFlags.SND_PURGE);
+            outputDevice?.Stop();
+
+            ResetVolume();
+        }
+
+        /// <summary>
+        /// ボリュームを100に戻す
+        /// </summary>
+        private void ResetVolume()
+        {
+            MMDevice device = null;
+            try
+            {
+                using (MMDeviceEnumerator DevEnum = new MMDeviceEnumerator())
+                {
+                    device = DevEnum.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
+                }
+                AudioSessionManager sessionManager = device.AudioSessionManager;
+                var sessions = sessionManager.Sessions;
+                for (int j = 0; j < sessions.Count; j++)
+                {
+                    sessions[j].SimpleAudioVolume.Volume = 1.0f;
+                }
+            }
+            finally
+            {
+                if (device != null)
+                {
+                    device.Dispose();
+                }
+            }
         }
 
         /// <summary>
