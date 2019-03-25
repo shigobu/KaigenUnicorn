@@ -1,4 +1,4 @@
-﻿using CoreAudioApi;
+﻿using NAudio.CoreAudioApi;
 using System;
 using System.Media;
 using System.Threading;
@@ -189,16 +189,17 @@ namespace 改元ユニコーン
             {
                 using (MMDeviceEnumerator DevEnum = new MMDeviceEnumerator())
                 {
-                    device = DevEnum.GetDefaultAudioEndpoint(EDataFlow.eRender, ERole.eMultimedia);
+                    device = DevEnum.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
                 }
                 AudioSessionManager sessionManager = device.AudioSessionManager;
+                var sessions = sessionManager.Sessions;
                 for (float i = 100; i >= 0; i -= 1f)
                 {
-                    foreach (var item in sessionManager.Sessions)
+                    for (int j = 0; j < sessions.Count; j++)
                     {
-                        if (item.ProcessID != (uint)pid)
+                        if (sessions[j].GetProcessID != (uint)pid)
                         {
-                            item.SimpleAudioVolume.MasterVolume = (i / 100.0f);
+                            sessions[j].SimpleAudioVolume.Volume = (i / 100.0f);
                         }
                     }
                     Thread.Sleep(100);

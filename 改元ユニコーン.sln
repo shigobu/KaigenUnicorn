@@ -5,8 +5,6 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "改元ユニコーン", "改元ユニコーン\改元ユニコーン.csproj", "{507804C9-15FE-4B79-ACBC-F2FA0ACE4781}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoreAudioApi", "CoreAudioApi\CoreAudioApi.csproj", "{BC339D74-1608-4C64-A2D8-6133041BF144}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,10 +15,6 @@ Global
 		{507804C9-15FE-4B79-ACBC-F2FA0ACE4781}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{507804C9-15FE-4B79-ACBC-F2FA0ACE4781}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{507804C9-15FE-4B79-ACBC-F2FA0ACE4781}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BC339D74-1608-4C64-A2D8-6133041BF144}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BC339D74-1608-4C64-A2D8-6133041BF144}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BC339D74-1608-4C64-A2D8-6133041BF144}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BC339D74-1608-4C64-A2D8-6133041BF144}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
