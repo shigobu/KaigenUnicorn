@@ -29,7 +29,7 @@ namespace 改元ユニコーン
         private Task fadeOutTask = null;
 
         //Unicorn再生関連
-        private static string unicornWavePath = @"D:\茂信\Music\青と白の逆方向.wav";
+        private static string unicornWavePath = @"D:\nc112577.mp3";
 
         //フラグ
         /// <summary>
@@ -66,8 +66,10 @@ namespace 改元ユニコーン
             {
                 tokenSource = new CancellationTokenSource();
                 token = tokenSource.Token;
-				datePicker1.SelectedDate = new DateTime(2019, 3, 21, 15, 30, 0);
-                await Task.Run(new Action(MainLoop), token);
+#if DEBUG
+				datePicker1.SelectedDate = new DateTime(2019, 3, 27, 21, 15, 0);
+#endif
+				await Task.Run(new Action(MainLoop), token);
             }
             catch (Exception ex)
             {
