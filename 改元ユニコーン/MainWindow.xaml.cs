@@ -23,7 +23,7 @@ namespace 改元ユニコーン
         private CancellationToken token;
 
         //ユニコーンが完全勝利するまでの秒数
-		private static int winnerTime = 41;
+		private static int winnerTime = 42;
 
         //フェードアウトタスク
         private Task fadeOutTask = null;
