@@ -69,6 +69,7 @@ namespace 改元ユニコーン
         {
             base.OnSourceInitialized(e);
             IntPtr handle = new WindowInteropHelper(this).Handle;
+            //ダイアログモーダルフレームを設定するとアイコン消える。
             int style = GetWindowLong(handle, GWL_EXSTYLE);
             style = style | WS_EX_DLGMODALFRAME;
             SetWindowLong(handle, GWL_EXSTYLE, style);
