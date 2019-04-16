@@ -3,9 +3,11 @@ using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using System;
 using System.Media;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Interop;
 
 namespace 改元ユニコーン
 {
@@ -52,6 +54,29 @@ namespace 改元ユニコーン
         {
             InitializeComponent();
         }
+
+        #region アイコン消す処理
+        [DllImport("user32.dll")]
+        private static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+
+        [DllImport("user32.dll")]
+        private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+
+        const int GWL_EXSTYLE = -20;
+        const int WS_EX_DLGMODALFRAME = 0x1;
+
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            base.OnSourceInitialized(e);
+            IntPtr handle = new WindowInteropHelper(this).Handle;
+            //ダイアログモーダルフレームを設定するとアイコン消える。
+            int style = GetWindowLong(handle, GWL_EXSTYLE);
+            style = style | WS_EX_DLGMODALFRAME;
+            SetWindowLong(handle, GWL_EXSTYLE, style);
+
+            base.OnSourceInitialized(e);
+        }
+        #endregion
 
         /// <summary>
         /// 表示されたとき
