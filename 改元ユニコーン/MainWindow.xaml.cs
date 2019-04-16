@@ -23,7 +23,7 @@ namespace 改元ユニコーン
         private CancellationToken token;
 
         //ユニコーンが完全勝利するまでの秒数
-		private static int winnerTime = 42;
+		private static int winnerTime = 41;
 
         //フェードアウトタスク
         private Task fadeOutTask = null;
@@ -67,7 +67,7 @@ namespace 改元ユニコーン
                 tokenSource = new CancellationTokenSource();
                 token = tokenSource.Token;
 #if DEBUG
-				datePicker1.SelectedDate = new DateTime(2019, 3, 27, 21, 15, 0);
+				datePicker1.SelectedDate = new DateTime(2019, 4, 12, 21, 35, 0);
 #endif
 				await Task.Run(new Action(MainLoop), token);
             }
@@ -103,7 +103,7 @@ namespace 改元ユニコーン
                 //Unicorn読み込み開始時間
                 DateTime loadUnicornTime = startUnicornTime - new TimeSpan(0, 1, 0);
                 //フェードアウト開始時間
-                DateTime fadeoutStartTime = startUnicornTime - new TimeSpan(0, 0, 8);
+                DateTime fadeoutStartTime = startUnicornTime - new TimeSpan(0, 0, 7);
                 //現在時刻取得
                 DateTime NowTime = DateTime.Now;
 
