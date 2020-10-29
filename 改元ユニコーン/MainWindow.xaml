@@ -10,5 +10,10 @@
     <StackPanel Margin="5">
         <TextBlock Margin="3" Text="改元の日付を指定"/>
         <DatePicker x:Name="datePicker1" Margin="3" SelectedDateFormat="Long" SelectedDate="2019/5/1"/>
-    </StackPanel>
+		<CheckBox x:Name="PauseCheckBox" Content="勝利前に一時停止する" Margin="3" IsChecked="True"/>
+		<Button x:Name="startButton" DockPanel.Dock="Left" Height="30" Width="25" Margin="3" IsEnabled="False" Click="StartButton_Click">
+			<Polygon Points="0,0 0,20 17.3,10" Fill="Lime" Stroke="Black" StrokeThickness="1" x:Name="PlayIcon" IsEnabledChanged="PlayIcon_IsEnabledChanged"/>
+		</Button>
+
+	</StackPanel>
 </Window>

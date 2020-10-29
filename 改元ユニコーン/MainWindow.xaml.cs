@@ -8,6 +8,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
+using System.Windows.Media;
+using System.Windows.Shapes;
 
 namespace 改元ユニコーン
 {
@@ -31,7 +33,7 @@ namespace 改元ユニコーン
         private Task fadeOutTask = null;
 
         //Unicorn再生関連
-        private static string unicornWavePath = @"D:\nc112577.mp3";
+        private static string unicornWavePath = @"D:\nc214324.wav";
 
         //フラグ
         /// <summary>
@@ -48,6 +50,11 @@ namespace 改元ユニコーン
         /// フェードアウト開始済フラグ
         /// </summary>
         private bool IsFadeoutStart { get; set; } = false;
+
+		/// <summary>
+		/// ユニコーン一時停止フラグ
+		/// </summary>
+		private bool IsPauseUnicorn { get; set; } = false;
 
 
         public MainWindow()
@@ -92,7 +99,10 @@ namespace 改元ユニコーン
                 tokenSource = new CancellationTokenSource();
                 token = tokenSource.Token;
 #if DEBUG
-				datePicker1.SelectedDate = new DateTime(2019, 4, 12, 21, 35, 0);
+				datePicker1.SelectedDate = new DateTime(2020, 10, 29, 18, 57, 0);
+#else
+				DateTime nowTime = DateTime.Now;
+				datePicker1.SelectedDate = nowTime.Date + new TimeSpan(1, 0, 0, 0);
 #endif
 				await Task.Run(new Action(MainLoop), token);
             }
@@ -129,8 +139,10 @@ namespace 改元ユニコーン
                 DateTime loadUnicornTime = startUnicornTime - new TimeSpan(0, 1, 0);
                 //フェードアウト開始時間
                 DateTime fadeoutStartTime = startUnicornTime - new TimeSpan(0, 0, 7);
-                //現在時刻取得
-                DateTime NowTime = DateTime.Now;
+				//一時停止する時間
+				DateTime pauseTime = kaigenTime + new TimeSpan(0, 0, 0, 0, 650);
+				//現在時刻取得
+				DateTime NowTime = DateTime.Now;
 
                 if (NowTime >= loadUnicornTime)
                 {
@@ -147,6 +159,10 @@ namespace 改元ユニコーン
                     //フェードアウト開始
                     FadeOutStart();
                 }
+				if (NowTime >= pauseTime)
+				{
+					PauseUnicorn();
+				}
 				Thread.Sleep(10);
             }
         }
@@ -206,10 +222,33 @@ namespace 改元ユニコーン
             IsStartUnicorn = true;
         }
 
-        /// <summary>
-        /// フェードアウトを開始します。
-        /// </summary>
-        private void FadeOutStart()
+		/// <summary>
+		/// Unicornの一時停止をします。
+		/// </summary>
+		private void PauseUnicorn()
+		{
+			if (!GetPauseCheced())
+			{
+				return;
+			}
+
+			//一回のみ実行させる
+			if (IsPauseUnicorn)
+			{
+				return;
+			}
+
+			//一時停止
+			outputDevice?.Pause();
+			SetStartButtonEnabled(true);
+
+			IsPauseUnicorn = true;
+		}
+
+		/// <summary>
+		/// フェードアウトを開始します。
+		/// </summary>
+		private void FadeOutStart()
         {
             //一回のみ実行させる
             if (IsFadeoutStart)
@@ -344,5 +383,55 @@ namespace 改元ユニコーン
                 return datePicker1.Dispatcher.Invoke<DateTime>(new Func<DateTime>(GetKaigenTime));
             }
         }
-    }
+
+		/// <summary>
+		/// 再生ボタンに使われているアイコンの活性・非活性を切り替えます。
+		/// </summary>
+		private void PlayIcon_IsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
+		{
+			Shape shape = sender as Shape;
+			if (shape.IsEnabled)
+			{
+				shape.Fill = Brushes.Lime;
+				shape.Stroke = Brushes.Black;
+			}
+			else
+			{
+				shape.Fill = Brushes.LightGray;
+				shape.Stroke = Brushes.LightGray;
+			}
+		}
+
+		private bool GetPauseCheced()
+		{
+			if (PauseCheckBox.Dispatcher.CheckAccess())
+			{
+				return (bool)PauseCheckBox.IsChecked;
+			}
+			else
+			{
+				return PauseCheckBox.Dispatcher.Invoke<bool>(new Func<bool>(GetPauseCheced));
+			}
+		}
+
+		delegate void SetStartButtonEnabledDelegate(bool enable);
+
+		private void SetStartButtonEnabled(bool enable)
+		{
+			if (startButton.Dispatcher.CheckAccess())
+			{
+				startButton.IsEnabled = enable;
+			}
+			else
+			{
+				startButton.Dispatcher.Invoke(new SetStartButtonEnabledDelegate(SetStartButtonEnabled), enable);
+			}
+		}
+
+		private void StartButton_Click(object sender, RoutedEventArgs e)
+		{
+			//再生
+			outputDevice?.Play();
+		}
+	}
 }
